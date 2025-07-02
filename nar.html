@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate-key="pageTitle">Nar /nɑr/ - Personal Budget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="nar.css">
+</head>
+<body class="text-slate-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+
+        <header class="flex flex-wrap justify-between items-center mb-8">
+            <button id="logo-btn" class="flex items-center space-x-3 group focus:outline-none">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-brand-red group-hover:text-red-700 transition-colors duration-300">
+                    <path d="M12 2C12 2 13 4.25 15.5 5.5C18 6.75 20 6 20 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 2C12 2 11 4.25 8.5 5.5C6 6.75 4 6 4 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22C12 22 13 19.75 15.5 18.5C18 17.25 20 18 20 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22C12 22 11 19.75 8.5 18.5C6 17.25 4 18 4 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12C2 12 4.25 13 5.5 15.5C6.75 18 6 20 6 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12C2 12 4.25 11 5.5 8.5C6.75 6 6 4 6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 12C22 12 19.75 13 18.5 15.5C17.25 18 18 20 18 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 12C22 12 19.75 11 18.5 8.5C17.25 6 18 4 18 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <h1 class="text-3xl font-bold text-slate-800 group-hover:text-red-700 transition-colors duration-300">Nar /nɑr/</h1>
+            </button>
+            <div class="flex items-center space-x-2 mt-4 sm:mt-0">
+                 <div id="lang-switcher" class="flex items-center space-x-1 border border-slate-300 rounded-lg p-1 bg-white shadow-sm">
+                    <button data-lang="en" class="lang-btn px-3 py-1 text-sm rounded-md font-semibold">EN</button>
+                    <button data-lang="az" class="lang-btn px-3 py-1 text-sm rounded-md font-semibold">AZ</button>
+                    <button data-lang="ru" class="lang-btn px-3 py-1 text-sm rounded-md font-semibold">RU</button>
+                </div>
+                <button id="export-csv" class="bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-4 border border-slate-300 rounded-lg shadow-sm text-sm">
+                    <i data-lucide="download" class="inline-block w-4 h-4 mr-1"></i> <span data-translate-key="exportCSV">Export CSV</span>
+                </button>
+                <label for="import-csv" class="cursor-pointer bg-white hover:bg-slate-100 text-slate-700 font-semibold py-2 px-4 border border-slate-300 rounded-lg shadow-sm text-sm">
+                    <i data-lucide="upload" class="inline-block w-4 h-4 mr-1"></i> <span data-translate-key="importCSV">Import CSV</span>
+                </label>
+                <input type="file" id="import-csv" class="hidden" accept=".csv">
+                <button id="wipe-data-btn" class="bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-4 border border-red-300 rounded-lg shadow-sm text-sm">
+                    <i data-lucide="trash-2" class="inline-block w-4 h-4 mr-1"></i> <span data-translate-key="wipeData">Wipe Data</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <section class="mb-8 bg-white p-4 rounded-xl shadow-md border border-slate-200">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div>
+                        <label for="start-date" class="block text-sm font-medium text-slate-700" data-translate-key="startDate">Start Date</label>
+                        <input type="date" id="start-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="end-date" class="block text-sm font-medium text-slate-700" data-translate-key="endDate">End Date</label>
+                        <input type="date" id="end-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                     <div class="flex items-end h-full">
+                        <button id="reset-date-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg shadow-sm">
+                            <i data-lucide="rotate-cw" class="inline-block w-4 h-4 mr-1"></i> <span data-translate-key="reset">Reset</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-slate-600" data-translate-key="totalIncome">Total Income</h2>
+                        <span class="bg-green-100 text-green-600 p-2 rounded-full">
+                            <i data-lucide="arrow-up-right" class="w-6 h-6"></i>
+                        </span>
+                    </div>
+                    <p id="total-income" class="text-3xl font-bold mt-2">$0.00</p>
+                    <p class="text-sm text-slate-500 mt-1 summary-period" data-translate-key="forThisMonth">for this month</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-slate-600" data-translate-key="totalExpenses">Total Expenses</h2>
+                        <span class="bg-red-100 text-red-600 p-2 rounded-full">
+                            <i data-lucide="arrow-down-right" class="w-6 h-6"></i>
+                        </span>
+                    </div>
+                    <p id="total-expenses" class="text-3xl font-bold mt-2">$0.00</p>
+                    <p class="text-sm text-slate-500 mt-1 summary-period" data-translate-key="forThisMonth">for this month</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-slate-600" data-translate-key="netCashFlow">Net Cash Flow</h2>
+                         <span class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                            <i data-lucide="scale" class="w-6 h-6"></i>
+                        </span>
+                    </div>
+                    <p id="net-cashflow" class="text-3xl font-bold mt-2">$0.00</p>
+                    <p class="text-sm text-slate-500 mt-1 summary-period" data-translate-key="forThisMonth">for this month</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-lg font-semibold text-slate-600" data-translate-key="monthlySavingsGoal">Monthly Savings Goal</h2>
+                        <span class="bg-yellow-100 text-yellow-600 p-2 rounded-full">
+                            <i data-lucide="target" class="w-6 h-6"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-center space-x-2">
+                         <input type="number" id="savings-goal-input" placeholder="e.g., 500" class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                         <button id="set-goal-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg" data-translate-key="setGoal">Set</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="text-center mb-8">
+                <button id="add-transaction-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                    <i data-lucide="plus-circle" class="inline-block w-5 h-5 mr-2"></i><span data-translate-key="addTransaction">Add Transaction</span>
+                </button>
+            </div>
+
+            <section class="mb-12">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold" data-translate-key="expensePockets">Expense Pockets</h2>
+                    <button id="manage-categories-btn" class="text-sm text-blue-600 font-semibold hover:underline">
+                        <i data-lucide="settings-2" class="inline-block w-4 h-4 mr-1"></i><span data-translate-key="manageCategories">Manage Categories</span>
+                    </button>
+                </div>
+                <div id="pockets-container" class="space-y-6">
+                    </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold mb-6 text-center" data-translate-key="spendingAnalysis">Spending Analysis</h2>
+                <div class="space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                            <h3 class="text-lg font-bold mb-4" data-translate-key="expenseBreakdown">Expense Breakdown</h3>
+                            <canvas id="expense-chart"></canvas>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                            <h3 class="text-lg font-bold mb-4" data-translate-key="budgetVsActuals">Budget vs. Actuals</h3>
+                            <canvas id="budget-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                        <h3 class="text-lg font-bold mb-4" data-translate-key="trendChartTitle">6-Month Income vs. Expense Trend</h3>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                        <h3 class="text-lg font-bold mb-4" data-translate-key="savingsChartTitle">Savings Journey (12-Month View)</h3>
+                        <canvas id="savings-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+	<div id="about-modal" class="modal-overlay">
+		<div class="modal-content max-w-4xl"> <div class="flex justify-between items-center mb-6">
+				<h3 class="text-2xl font-bold text-slate-800" data-translate-key="aboutTitle">The Story of Nar pomegranate</h3>
+				<button id="close-about-modal" class="text-slate-500 hover:text-slate-800 text-3xl leading-none">&times;</button>
+			</div>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div class="space-y-4 text-base text-slate-700">
+					<p data-translate-key="aboutP1">In Azerbaijani culture, the pomegranate—or "Nar" /nɑr/—is a powerful symbol of abundance and unity. With its tough outer skin protecting hundreds of precious seeds, it perfectly represents financial wellness: safeguarding your resources so that many small efforts can grow into significant wealth.</p>
+					<p data-translate-key="aboutP2">Each seed is a transaction, a saving, a goal. Together, they form a vibrant whole. That is the vision behind Nar.</p>
+					
+					<div class="p-4 bg-brand-beige rounded-lg border border-brand-red/20">
+						<p data-translate-key="aboutP3">But the path to abundance isn't always smooth. For its creators, a passionate husband and wife, discussions about money were often filled with... well, *passion*. The problem wasn't a lack of shared dreams, but the absence of a simple, shared language for their finances. They needed a tool to turn potential arguments into moments of alignment.</p>
+					</div>
+	
+					<p data-translate-key="aboutP4">Nar was born from this love—a desire to create an intuitive tool that replaces confusion with clarity. It’s a quiet, focused space designed not just for budgeting, but for building a life of abundance together, one seed at a time.</p>
+				</div>
+				<div class="flex flex-col items-center justify-center">
+					<img src="love_birds.JPG" alt="The creators of Nar" class="rounded-lg shadow-lg w-full max-w-xs object-cover">
+					<p class="text-sm text-slate-500 mt-2 font-semibold" data-translate-key="aboutCreators">The Creators of Nar</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <div id="transaction-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="transaction-modal-title" class="text-xl font-bold mb-4" data-translate-key="addTransactionTitle">Add Transaction</h3>
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="transaction-amount" class="block text-sm font-medium text-slate-700" data-translate-key="amount">Amount</label>
+                        <input type="number" id="transaction-amount" step="0.01" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="transaction-description" class="block text-sm font-medium text-slate-700" data-translate-key="description">Description</label>
+                        <input type="text" id="transaction-description" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="transaction-date" class="block text-sm font-medium text-slate-700" data-translate-key="date">Date</label>
+                        <input type="date" id="transaction-date" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="transaction-category" class="block text-sm font-medium text-slate-700" data-translate-key="category">Category</label>
+                        <select id="transaction-category" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></select>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancel-transaction" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg" data-translate-key="cancel">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg" data-translate-key="saveTransaction">Save Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="category-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" data-translate-key="manageCategories">Manage Categories</h3>
+                <button id="close-category-modal" class="text-slate-500 hover:text-slate-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="category-list" class="space-y-2 mb-4"></div>
+            <button id="add-category-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg" data-translate-key="addNewCategory">Add New Category</button>
+        </div>
+    </div>
+
+    <div id="category-form-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="category-form-title" class="text-xl font-bold mb-4" data-translate-key="addCategoryTitle">Add Category</h3>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <div class="space-y-4">
+                    <div>
+                        <label for="category-name" class="block text-sm font-medium text-slate-700" data-translate-key="categoryName">Category Name</label>
+                        <input type="text" id="category-name" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="category-type" class="block text-sm font-medium text-slate-700" data-translate-key="type">Type</label>
+                        <select id="category-type" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="Expense" data-translate-key="expense">Expense</option>
+                            <option value="Income" data-translate-key="income">Income</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="category-icon" class="block text-sm font-medium text-slate-700" data-translate-key="icon">Icon</label>
+                        <select id="category-icon" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></select>
+                    </div>
+                    <div id="expense-fields" class="space-y-4">
+                        <div>
+                            <label for="category-budget" class="block text-sm font-medium text-slate-700" data-translate-key="monthlyBudget">Monthly Budget</label>
+                            <input type="number" id="category-budget" step="0.01" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="category-group" class="block text-sm font-medium text-slate-700" data-translate-key="pocketGroup">Pocket Group</label>
+                            <input type="text" id="category-group" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button" id="cancel-category" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg" data-translate-key="cancel">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg" data-translate-key="saveCategory">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="history-modal-title" class="text-xl font-bold" data-translate-key="history">History</h3>
+                <button id="close-history-modal" class="text-slate-500 hover:text-slate-800 text-3xl leading-none">&times;</button>
+            </div>
+            <div id="history-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4" data-translate-key="areYouSure">Are you sure?</h3>
+            <p id="confirm-message" class="text-slate-600 mb-6"></p>
+            <div class="flex justify-end space-x-3">
+                <button id="confirm-cancel" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg" data-translate-key="cancel">Cancel</button>
+                <button id="confirm-proceed" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg" data-translate-key="proceed">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="nar.js"></script>
+</body>
+</html>
