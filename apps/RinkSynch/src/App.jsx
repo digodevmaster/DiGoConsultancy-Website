@@ -9,7 +9,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDSh23j3GUG3B75GBG9JrtHWFFnGQpRc_c",
     authDomain: "rinksync-data.firebaseapp.com",
     projectId: "rinksync-data",
-    storageBucket: "rinksync-data.firebasestorage.app",
+    storageBucket: "rinksync-data.appspot.com",
     messagingSenderId: "314288698038",
     appId: "1:314288698038:web:fd90b95489a4584429ac17",
     measurementId: "G-5V5SLSYYTT"
@@ -30,11 +30,11 @@ const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DEFAULT_PLAYER_CONFIG = {
     'player1': { name: 'Oldest Daughter', avatar: '👧🏻', color: 'bg-pink-200', textColor: 'text-pink-800', borderColor: 'border-pink-400' },
     'player2': { name: 'Younger Daughter', avatar: '👩🏻', color: 'bg-purple-200', textColor: 'text-purple-800', borderColor: 'border-purple-400' },
-    'player3': { name: 'Son', avatar: '👦🏻', color: 'bg-blue-200', textColor: 'text-blue-800', borderColor: 'border-blue-400' },
+    'player3': { name: 'Son', avatar: '👦�', color: 'bg-blue-200', textColor: 'text-blue-800', borderColor: 'border-blue-400' },
 };
 
 const EMOJI_CATEGORIES = {
-    'People': ['👧🏻', '👩🏻', '👦🏻', '👨🏻', '🧑🏻', '👱🏻‍♀️', '👱🏻‍♂️', '👩🏻‍🦰', '👨🏻‍🦰', '👩🏻‍🦳', '👨🏻‍🦳', '👶', '👮', '👷', '🕵️', '🧑‍⚕️', '🧑‍🌾', '🧑‍🍳', '🧑‍🎓', '🧑‍�', '🧑‍🏫', '🧑‍💻', '🧑‍🚀'],
+    'People': ['👧🏻', '👩🏻', '👦🏻', '👨🏻', '🧑🏻', '👱🏻‍♀️', '👱🏻‍♂️', '👩🏻‍🦰', '👨🏻‍🦰', '👩🏻‍🦳', '👨🏻‍🦳', '👶', '👮', '👷', '🕵️', '🧑‍⚕️', '🧑‍🌾', '🧑‍🍳', '🧑‍🎓', '🧑‍🎤', '🧑‍🏫', '🧑‍💻', '🧑‍🚀'],
     'Hockey': ['🏒', '🥅', '⛸️', '🏆', '🥇', '🥈', '🥉', '🏟️', '📣', '🚨', '⏱️'],
     'Hockey Slang': ['🎯', '🚀', '🎉', '💨', '💥', '💪', '🧱', '🎩'],
     'Animals & Mythical': [' Bigfoot ', '🐻', '🦊', '🐺', '🦁', '🐯', '🦄', '🐲', '🦅', '🦈', '🐍'],
@@ -61,7 +61,7 @@ const themes = {
     },
     culverEagles: {
         name: 'Culver Eagles',
-        bg: 'bg-[#6F263D]', header: 'text-white', calendarBg: 'bg-gray-100', dayCell: 'bg-white', otherMonthCell: 'bg-gray-200 text-gray-500', todayCell: 'bg-yellow-100 border-yellow-300', primaryButton: 'bg-[#6F263D] hover:bg-red-900 text-white', secondaryButton: 'bg-yellow-400 hover:bg-yellow-500 text-black',
+        bg: 'bg-red-900', header: 'text-white', calendarBg: 'bg-gray-100', dayCell: 'bg-white', otherMonthCell: 'bg-gray-200 text-gray-500', todayCell: 'bg-yellow-100 border-yellow-300', primaryButton: 'bg-red-800 hover:bg-red-900 text-white', secondaryButton: 'bg-yellow-400 hover:bg-yellow-500 text-black',
         events: { 'Practice': { color: 'bg-red-200', textColor: 'text-red-800' }, 'Tournament': { color: 'bg-yellow-200', textColor: 'text-yellow-800' }, 'League Game': { color: 'bg-gray-300', textColor: 'text-black' }, 'Tryout': { color: 'bg-white', textColor: 'text-black' }, 'Dry-land Workout': { color: 'bg-red-300', textColor: 'text-red-900' }, 'Camp': { color: 'bg-yellow-300', textColor: 'text-yellow-900' }, 'Other': { color: 'bg-gray-400', textColor: 'text-black' }, }
     },
     dallasStars: {
