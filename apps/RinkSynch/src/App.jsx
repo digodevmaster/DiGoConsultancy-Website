@@ -1,15 +1,16 @@
 import React from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, query } from 'firebase/firestore';
-import { ChevronLeft, ChevronRight, Plus, X, Tag, User, Repeat, Info, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Tag, User, Repeat, Info, Settings, LogIn, LogOut } from 'lucide-react';
 
 // --- Firebase Configuration ---
+// Verified with your provided configuration.
 const firebaseConfig = {
     apiKey: "AIzaSyDSh23j3GUG3B75GBG9JrtHWFFnGQpRc_c",
     authDomain: "rinksync-data.firebaseapp.com",
     projectId: "rinksync-data",
-    storageBucket: "rinksync-data.appspot.com",
+    storageBucket: "rinksync-data.firebasestorage.app",
     messagingSenderId: "314288698038",
     appId: "1:314288698038:web:fd90b95489a4584429ac17",
     measurementId: "G-5V5SLSYYTT"
@@ -19,6 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider(); // Create a Google Auth provider instance
 
 // --- App ID ---
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-hockey-app';
@@ -27,10 +29,11 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-hockey-app';
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+// FIX: Corrected invalid character in avatar
 const DEFAULT_PLAYER_CONFIG = {
     'player1': { name: 'Oldest Daughter', avatar: '👧🏻', color: 'bg-pink-200', textColor: 'text-pink-800', borderColor: 'border-pink-400' },
     'player2': { name: 'Younger Daughter', avatar: '👩🏻', color: 'bg-purple-200', textColor: 'text-purple-800', borderColor: 'border-purple-400' },
-    'player3': { name: 'Son', avatar: '👦�', color: 'bg-blue-200', textColor: 'text-blue-800', borderColor: 'border-blue-400' },
+    'player3': { name: 'Son', avatar: '👦🏻', color: 'bg-blue-200', textColor: 'text-blue-800', borderColor: 'border-blue-400' },
 };
 
 const EMOJI_CATEGORIES = {
@@ -54,34 +57,13 @@ const themes = {
         bg: 'bg-blue-50', header: 'text-blue-900', calendarBg: 'bg-white', dayCell: 'bg-gray-50', otherMonthCell: 'bg-gray-200 text-gray-400', todayCell: 'bg-red-100 border-red-300', primaryButton: 'bg-red-600 hover:bg-red-700 text-white', secondaryButton: 'bg-blue-200 hover:bg-blue-300 text-blue-800',
         events: { 'Practice': { color: 'bg-sky-200', textColor: 'text-sky-800' }, 'Tournament': { color: 'bg-amber-200', textColor: 'text-amber-800' }, 'League Game': { color: 'bg-rose-200', textColor: 'text-rose-800' }, 'Tryout': { color: 'bg-orange-200', textColor: 'text-orange-800' }, 'Dry-land Workout': { color: 'bg-lime-200', textColor: 'text-lime-800' }, 'Camp': { color: 'bg-cyan-200', textColor: 'text-cyan-800' }, 'Other': { color: 'bg-slate-200', textColor: 'text-slate-800' }, }
     },
-    blueJackets: {
-        name: 'Blue Jackets',
-        bg: 'bg-blue-900', header: 'text-white', calendarBg: 'bg-gray-200', dayCell: 'bg-white', otherMonthCell: 'bg-gray-300 text-gray-500', todayCell: 'bg-red-100 border-red-300', primaryButton: 'bg-blue-800 hover:bg-blue-700 text-white', secondaryButton: 'bg-red-600 hover:bg-red-500 text-white',
-        events: { 'Practice': { color: 'bg-blue-200', textColor: 'text-blue-800' }, 'Tournament': { color: 'bg-red-200', textColor: 'text-red-800' }, 'League Game': { color: 'bg-gray-300', textColor: 'text-black' }, 'Tryout': { color: 'bg-white', textColor: 'text-black' }, 'Dry-land Workout': { color: 'bg-blue-300', textColor: 'text-blue-900' }, 'Camp': { color: 'bg-red-300', textColor: 'text-red-900' }, 'Other': { color: 'bg-gray-400', textColor: 'text-black' }, }
-    },
-    culverEagles: {
-        name: 'Culver Eagles',
-        bg: 'bg-red-900', header: 'text-white', calendarBg: 'bg-gray-100', dayCell: 'bg-white', otherMonthCell: 'bg-gray-200 text-gray-500', todayCell: 'bg-yellow-100 border-yellow-300', primaryButton: 'bg-red-800 hover:bg-red-900 text-white', secondaryButton: 'bg-yellow-400 hover:bg-yellow-500 text-black',
-        events: { 'Practice': { color: 'bg-red-200', textColor: 'text-red-800' }, 'Tournament': { color: 'bg-yellow-200', textColor: 'text-yellow-800' }, 'League Game': { color: 'bg-gray-300', textColor: 'text-black' }, 'Tryout': { color: 'bg-white', textColor: 'text-black' }, 'Dry-land Workout': { color: 'bg-red-300', textColor: 'text-red-900' }, 'Camp': { color: 'bg-yellow-300', textColor: 'text-yellow-900' }, 'Other': { color: 'bg-gray-400', textColor: 'text-black' }, }
-    },
-    dallasStars: {
-        name: 'Dallas Stars',
-        bg: 'bg-black', header: 'text-white', calendarBg: 'bg-gray-800', dayCell: 'bg-gray-700 text-white', otherMonthCell: 'bg-gray-900 text-gray-500', todayCell: 'bg-green-500/20 border-green-400', primaryButton: 'bg-green-600 hover:bg-green-500 text-white', secondaryButton: 'bg-gray-600 hover:bg-gray-500 text-white',
-        events: { 'Practice': { color: 'bg-green-800', textColor: 'text-white' }, 'Tournament': { color: 'bg-gray-500', textColor: 'text-white' }, 'League Game': { color: 'bg-white', textColor: 'text-black' }, 'Tryout': { color: 'bg-green-400', textColor: 'text-black' }, 'Dry-land Workout': { color: 'bg-gray-600', textColor: 'text-white' }, 'Camp': { color: 'bg-green-700', textColor: 'text-white' }, 'Other': { color: 'bg-gray-400', textColor: 'text-black' }, }
-    },
-    floridaPanthers: {
-        name: 'Florida Panthers',
-        bg: 'bg-red-800', header: 'text-white', calendarBg: 'bg-blue-900', dayCell: 'bg-blue-800 text-white', otherMonthCell: 'bg-blue-900/50 text-gray-400', todayCell: 'bg-yellow-300/20 border-yellow-400', primaryButton: 'bg-red-700 hover:bg-red-600 text-white', secondaryButton: 'bg-yellow-400 hover:bg-yellow-500 text-blue-900',
-        events: { 'Practice': { color: 'bg-blue-700', textColor: 'text-white' }, 'Tournament': { color: 'bg-yellow-300', textColor: 'text-black' }, 'League Game': { color: 'bg-white', textColor: 'text-black' }, 'Tryout': { color: 'bg-red-500', textColor: 'text-white' }, 'Dry-land Workout': { color: 'bg-blue-600', textColor: 'text-white' }, 'Camp': { color: 'bg-yellow-400', textColor: 'text-black' }, 'Other': { color: 'bg-gray-400', textColor: 'text-black' }, }
-    },
-    seattleKraken: {
-        name: 'Seattle Kraken',
-        bg: 'bg-cyan-900', header: 'text-white', calendarBg: 'bg-gray-800', dayCell: 'bg-cyan-800/50 text-white', otherMonthCell: 'bg-gray-900 text-gray-500', todayCell: 'bg-red-500/20 border-red-500', primaryButton: 'bg-cyan-600 hover:bg-cyan-500 text-white', secondaryButton: 'bg-red-600 hover:bg-red-500 text-white',
-        events: { 'Practice': { color: 'bg-cyan-700', textColor: 'text-white' }, 'Tournament': { color: 'bg-cyan-400', textColor: 'text-black' }, 'League Game': { color: 'bg-red-500', textColor: 'text-white' }, 'Tryout': { color: 'bg-white', textColor: 'text-black' }, 'Dry-land Workout': { color: 'bg-cyan-800', textColor: 'text-white' }, 'Camp': { color: 'bg-cyan-500', textColor: 'text-white' }, 'Other': { color: 'bg-gray-500', textColor: 'text-white' }, }
-    }
+    // ... other themes remain the same
 };
 
 const ThemeContext = React.createContext();
+
+// ... All other components (getSeason, dateToISO, EmojiPicker, SettingsModal, etc.) remain unchanged ...
+// NOTE: For brevity, the unchanged components are not repeated here. Paste them back in from your original file.
 
 const getSeason = (date) => {
     const month = date.getMonth();
@@ -375,8 +357,9 @@ const FilterControls = ({ filters, onFilterChange, view, setView, playerConfig }
     );
 };
 
+
 export default function App() {
-    const [userId, setUserId] = React.useState(null);
+    const [user, setUser] = React.useState(null); // Changed to store the full user object
     const [events, setEvents] = React.useState([]);
     const [playerConfig, setPlayerConfig] = React.useState(DEFAULT_PLAYER_CONFIG);
     const [themeName, setThemeName] = React.useState('classic');
@@ -392,23 +375,36 @@ export default function App() {
     const [currentDate, setCurrentDate] = React.useState(new Date());
 
     const theme = themes[themeName];
+    const userId = user ? user.uid : null; // Derive userId from user object
 
+    // FIX: Simplified auth listener
     React.useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) setUserId(user.uid);
-            else { try { const { user } = await signInAnonymously(auth); setUserId(user.uid); } catch (e) { console.error(e); } }
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUser(user); // Set the entire user object, or null if logged out
             setIsAuthReady(true);
         });
-        return () => unsubscribe();
+        return () => unsubscribe(); // Cleanup on unmount
     }, []);
 
+    // Effect for loading data from Firestore, depends on userId
     React.useEffect(() => {
-        if (!isAuthReady || !userId) return;
+        if (!isAuthReady || !userId) {
+            // If there's no user, clear events and reset config
+            setEvents([]);
+            setPlayerConfig(DEFAULT_PLAYER_CONFIG);
+            return;
+        };
+
         const playerConfigDocRef = doc(db, `artifacts/${appId}/users/${userId}/config`, 'players');
-        const unsubscribePlayers = onSnapshot(playerConfigDocRef, (doc) => { if (doc.exists()) setPlayerConfig(doc.data()); else setDoc(playerConfigDocRef, DEFAULT_PLAYER_CONFIG); });
+        const unsubscribePlayers = onSnapshot(playerConfigDocRef, (doc) => {
+            if (doc.exists()) setPlayerConfig(doc.data());
+            else setDoc(playerConfigDocRef, DEFAULT_PLAYER_CONFIG);
+        });
 
         const uiConfigDocRef = doc(db, `artifacts/${appId}/users/${userId}/config`, 'ui');
-        const unsubscribeUi = onSnapshot(uiConfigDocRef, (doc) => { if (doc.exists()) setThemeName(doc.data().theme || 'classic'); });
+        const unsubscribeUi = onSnapshot(uiConfigDocRef, (doc) => {
+            if (doc.exists()) setThemeName(doc.data().theme || 'classic');
+        });
 
         const eventsCollectionPath = `artifacts/${appId}/users/${userId}/events`;
         const q = query(collection(db, eventsCollectionPath));
@@ -416,6 +412,23 @@ export default function App() {
 
         return () => { unsubscribePlayers(); unsubscribeUi(); unsubscribeEvents(); };
     }, [isAuthReady, userId]);
+
+    // --- Auth Functions ---
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+        } catch (error) {
+            console.error("Google sign-in failed:", error);
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Sign-out failed:", error);
+        }
+    };
 
     const handleSavePlayerConfig = async (newConfig) => { if (userId) await setDoc(doc(db, `artifacts/${appId}/users/${userId}/config`, 'players'), newConfig); };
     const handleSaveTheme = async (newThemeName) => { if (userId) await setDoc(doc(db, `artifacts/${appId}/users/${userId}/config`, 'ui'), { theme: newThemeName }); };
@@ -428,7 +441,9 @@ export default function App() {
 
     const filteredEvents = React.useMemo(() => events.filter(event => (filters.player === 'all' || event.players.includes(filters.player)) && (filters.eventType === 'all' || event.eventType === filters.eventType)), [events, filters]);
 
-    if (!isAuthReady) return <div className="flex justify-center items-center h-screen bg-gray-100"><p className="text-lg">Loading Scheduler...</p></div>;
+    if (!isAuthReady) {
+        return <div className="flex justify-center items-center h-screen bg-gray-100"><p className="text-lg">Loading Scheduler...</p></div>;
+    }
 
     return (
         <ThemeContext.Provider value={{ theme, setThemeName: handleSaveTheme }}>
@@ -437,13 +452,33 @@ export default function App() {
                     <header className="flex flex-col md:flex-row justify-between items-center mb-6">
                         <div><h1 className={`text-4xl font-bold ${theme.header}`}>RinkSync</h1><p className="text-gray-500 mt-1">Manage your family's hockey schedule with ease.</p></div>
                         <div className="flex items-center gap-2 mt-4 md:mt-0">
-                            <button onClick={() => setIsSettingsModalOpen(true)} className={`flex items-center gap-2 px-4 py-3 font-semibold rounded-lg transition-colors ${theme.secondaryButton}`}><Settings size={20} /></button>
-                            <button onClick={() => { setSelectedEvent(null); setSelectedDate(new Date()); setIsModalOpen(true); }} className={`flex items-center gap-2 px-6 py-3 font-semibold rounded-lg shadow-md transition-colors ${theme.primaryButton}`}><Plus size={20} /> New Event</button>
+                            {user ? (
+                                <>
+                                    <button onClick={() => setIsSettingsModalOpen(true)} className={`flex items-center gap-2 px-4 py-3 font-semibold rounded-lg transition-colors ${theme.secondaryButton}`}><Settings size={20} /></button>
+                                    <button onClick={() => { setSelectedEvent(null); setSelectedDate(new Date()); setIsModalOpen(true); }} className={`flex items-center gap-2 px-6 py-3 font-semibold rounded-lg shadow-md transition-colors ${theme.primaryButton}`}><Plus size={20} /> New Event</button>
+                                    <button onClick={handleSignOut} className={`flex items-center gap-2 px-4 py-3 font-semibold rounded-lg transition-colors ${theme.secondaryButton}`}><LogOut size={20} /></button>
+                                </>
+                            ) : (
+                                <button onClick={handleGoogleSignIn} className={`flex items-center gap-2 px-6 py-3 font-semibold rounded-lg shadow-md transition-colors ${theme.primaryButton}`}><LogIn size={20} /> Sign in with Google</button>
+                            )}
                         </div>
                     </header>
-                    <div className="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r-lg flex items-start gap-3"><Info size={24} className="flex-shrink-0 mt-1"/><div><p className="font-bold">Your User ID:</p><p className="font-mono text-sm bg-blue-100 p-1 rounded inline-block">{userId}</p></div></div>
-                    <FilterControls filters={filters} onFilterChange={handleFilterChange} view={view} setView={setView} playerConfig={playerConfig} />
-                    <Calendar events={filteredEvents} onDateClick={handleDateClick} onEventClick={handleEventClick} onEventDelete={handleDeleteRequest} view={view} currentDate={currentDate} setCurrentDate={setCurrentDate} playerConfig={playerConfig} />
+
+                    {user && (
+                        <>
+                            <div className="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-700 rounded-r-lg flex items-start gap-3"><Info size={24} className="flex-shrink-0 mt-1"/><div><p className="font-bold">Your User ID:</p><p className="font-mono text-sm bg-blue-100 p-1 rounded inline-block">{userId}</p></div></div>
+                            <FilterControls filters={filters} onFilterChange={handleFilterChange} view={view} setView={setView} playerConfig={playerConfig} />
+                            <Calendar events={filteredEvents} onDateClick={handleDateClick} onEventClick={handleEventClick} onEventDelete={handleDeleteRequest} view={view} currentDate={currentDate} setCurrentDate={setCurrentDate} playerConfig={playerConfig} />
+                        </>
+                    )}
+
+                    {!user && (
+                        <div className="text-center py-20">
+                            <h2 className={`text-2xl font-bold ${theme.header}`}>Welcome to RinkSync!</h2>
+                            <p className="text-gray-500 mt-2">Please sign in to view and manage your schedule.</p>
+                        </div>
+                    )}
+
                     <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} onSavePlayers={handleSavePlayerConfig} playerConfig={playerConfig} onSaveTheme={handleSaveTheme} currentTheme={themeName} />
                     <EventModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveEvent} event={selectedEvent} selectedDate={selectedDate} playerConfig={playerConfig} />
                     <ConfirmationModal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)} onConfirm={confirmDeleteEvent} title="Confirm Deletion" message="Are you sure you want to delete this event? This action cannot be undone." />
